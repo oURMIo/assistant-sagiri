@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: sagiri
+
+  config:
+    import: classpath:config.properties
+
+logging:
+  level:
+    root: INFO
+    com.dach: DEBUG
