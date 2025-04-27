@@ -7,6 +7,7 @@ import com.pengrad.telegrambot.request.SendMessage;
 
 @Component
 public class PingPongCommand implements BotCommand {
+
     @Override
     public String command() {
         return "/ping";
