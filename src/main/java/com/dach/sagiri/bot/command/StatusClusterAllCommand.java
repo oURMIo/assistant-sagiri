@@ -34,7 +34,7 @@ public class StatusClusterAllCommand implements BotCommand {
         bot.execute(new SendMessage(message.chat().id(), resultText));
     }
 
-    private String checkServers() {
+    protected String checkServers() {
         boolean is1Working = webService.checkClusterStatus(cluster1Domain);
         boolean is2Working = webService.checkClusterStatus(cluster2Domain);
         return "Status:\n"

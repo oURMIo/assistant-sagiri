@@ -21,7 +21,8 @@ class BotMessageServiceTest {
     @Test
     void test_register_listener_successfully() {
         CommandService commandService = mock(CommandService.class);
-        BotMessageService botMessageService = new BotMessageService(commandService);
+        CallbackService callbackService = mock(CallbackService.class);
+        BotMessageService botMessageService = new BotMessageService(commandService, callbackService);
         TelegramBot telegramBot = mock(TelegramBot.class);
 
         botMessageService.registerListener(telegramBot);
@@ -33,7 +34,8 @@ class BotMessageServiceTest {
     @Test
     void test_handle_null_message_in_update() {
         CommandService commandService = mock(CommandService.class);
-        BotMessageService botMessageService = new BotMessageService(commandService);
+        CallbackService callbackService = mock(CallbackService.class);
+        BotMessageService botMessageService = new BotMessageService(commandService, callbackService);
         TelegramBot telegramBot = mock(TelegramBot.class);
 
         ArgumentCaptor<UpdatesListener> listenerCaptor = ArgumentCaptor.forClass(UpdatesListener.class);

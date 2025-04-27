@@ -10,6 +10,23 @@ import com.pengrad.telegrambot.request.SendMessage;
 @Component
 public class HelpCommand implements BotCommand {
 
+    private static final InlineKeyboardMarkup SUPPORTED_BUTTONS = new InlineKeyboardMarkup(
+        new InlineKeyboardButton[][]{
+            {
+                new InlineKeyboardButton("📊 Cluster Status").callbackData("cluster_status"),
+                new InlineKeyboardButton("🔗 Useful URLs").callbackData("useful_urls")
+            },
+            {
+                new InlineKeyboardButton("🔔 Notification").callbackData("notification"),
+                new InlineKeyboardButton("🌐 Domain Status").callbackData("domain_status")
+            },
+            {
+                new InlineKeyboardButton("🛠️ Project List").callbackData("project_list"),
+                new InlineKeyboardButton("🏓 Ping").callbackData("ping")
+            },
+        }
+    );
+
     @Override
     public String command() {
         return "/help";
@@ -20,13 +37,10 @@ public class HelpCommand implements BotCommand {
         String messageText = "Hello "
                              + message.from().firstName()
                              + ", I provide a list of my capabilities";
-        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup(
-            new InlineKeyboardButton("👍 Yes").callbackData("yes"),
-            new InlineKeyboardButton("👎 No").callbackData("no")
-        );
 
         SendMessage request = new SendMessage(message.chat().id(), messageText)
-            .replyMarkup(keyboard);
+            .replyMarkup(SUPPORTED_BUTTONS);
+
         bot.execute(request);
     }
 }

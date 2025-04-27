@@ -75,12 +75,6 @@ public class BotMessageService {
     }
 
     private void handleCallBack(TelegramBot bot, CallbackQuery callback) {
-    /*
-    TODO: Create call back components
-                        bot.execute(new AnswerCallbackQuery(callback.id())
-                            .text("Вы выбрали: " + data));
-                        bot.execute(new SendMessage(chatId, "Вы нажали: " + data));
-     */
         String data = callback.data();
         long chatId = callback.from().id();
         logger.info("Received callback from chatId:'{}', text:'{}'", chatId, data);
