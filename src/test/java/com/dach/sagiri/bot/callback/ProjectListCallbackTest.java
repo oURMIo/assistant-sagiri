@@ -14,22 +14,22 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class UsefulUrlCallbackTest {
+class ProjectListCallbackTest {
 
-    // Returns "useful_urls" as the callback identifier
+    // Returns "project_list" as the callback identifier
     @Test
-    void test_callback_returns_useful_urls() {
+    void test_callback_returns_project_list() {
         FileService fileService = mock(FileService.class);
-        UsefulUrlCallback usefulUrlCallback = new UsefulUrlCallback(fileService);
+        ProjectListCallback projectListCallback = new ProjectListCallback(fileService);
 
-        String callbackIdentifier = usefulUrlCallback.callback();
+        String callbackIdentifier = projectListCallback.callback();
 
-        assertEquals("useful_urls", callbackIdentifier);
+        assertEquals("project_list", callbackIdentifier);
     }
 
-    // Handles empty list of URLs by sending an error message
+    // Handles empty Optional from urlService.getProjectList()
     @Test
-    void test_execute_handles_empty_url_list() {
+    void test_execute_handles_empty_project_list() {
         FileService fileService = mock(FileService.class);
         TelegramBot bot = mock(TelegramBot.class);
         CallbackQuery callbackQuery = mock(CallbackQuery.class);
@@ -37,17 +37,17 @@ class UsefulUrlCallbackTest {
 
         when(callbackQuery.from()).thenReturn(user);
         when(user.id()).thenReturn(123456789L);
-        when(fileService.getUsefulUrls()).thenReturn(Optional.empty());
+        when(fileService.getProjectList()).thenReturn(Optional.empty());
 
-        UsefulUrlCallback usefulUrlCallback = new UsefulUrlCallback(fileService);
+        ProjectListCallback projectListCallback = new ProjectListCallback(fileService);
 
-        usefulUrlCallback.execute(bot, callbackQuery);
+        projectListCallback.execute(bot, callbackQuery);
 
         ArgumentCaptor<SendMessage> messageCaptor = ArgumentCaptor.forClass(SendMessage.class);
         verify(bot).execute(messageCaptor.capture());
 
         SendMessage capturedMessage = messageCaptor.getValue();
         assertEquals(123456789L, capturedMessage.getParameters().get("chat_id"));
-        assertEquals("Can't find useful urls இ௰இ", capturedMessage.getParameters().get("text"));
+        assertEquals("Can't find list of project இ௰இ", capturedMessage.getParameters().get("text"));
     }
 }
