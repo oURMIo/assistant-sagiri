@@ -1,8 +1,10 @@
 package com.dach.sagiri.bot.callback;
 
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import com.dach.sagiri.property.dto.UsefulUrl;
 import com.dach.sagiri.service.UrlService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.CallbackQuery;
@@ -12,27 +14,25 @@ import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class UsefulUrlCallbackTest {
 
-    // Callback returns the string "useful_urls"
+    // Returns "useful_urls" as the callback identifier
     @Test
     void test_callback_returns_useful_urls() {
         UrlService urlService = mock(UrlService.class);
+
         UsefulUrlCallback usefulUrlCallback = new UsefulUrlCallback(urlService);
 
-        String callbackValue = usefulUrlCallback.callback();
-
-        assertEquals("useful_urls", callbackValue);
+        assertEquals("useful_urls", usefulUrlCallback.callback());
     }
 
-    // Handle case when urlService.getAllUrls() returns empty map
+    // Handles empty list of URLs by sending an error message
     @Test
-    void test_execute_with_empty_url_map() {
+    void test_execute_handles_empty_url_list() {
         UrlService urlService = mock(UrlService.class);
         TelegramBot bot = mock(TelegramBot.class);
         CallbackQuery callbackQuery = mock(CallbackQuery.class);
@@ -40,7 +40,7 @@ class UsefulUrlCallbackTest {
 
         when(callbackQuery.from()).thenReturn(user);
         when(user.id()).thenReturn(123456789L);
-        when(urlService.getAllUrls()).thenReturn(Map.of());
+        when(urlService.getUsefulUrls()).thenReturn(Optional.empty());
 
         UsefulUrlCallback usefulUrlCallback = new UsefulUrlCallback(urlService);
         usefulUrlCallback.execute(bot, callbackQuery);
@@ -50,49 +50,46 @@ class UsefulUrlCallbackTest {
 
         SendMessage capturedMessage = messageCaptor.getValue();
         assertEquals(123456789L, capturedMessage.getParameters().get("chat_id"));
-        assertEquals("Useful URLs:", capturedMessage.getParameters().get("text"));
-
-        InlineKeyboardMarkup markup = (InlineKeyboardMarkup) capturedMessage.getParameters().get("reply_markup");
-        assertNotNull(markup);
+        assertEquals("Haven't any url இ௰இ", capturedMessage.getParameters().get("text"));
     }
 
-    // Execute method creates an InlineKeyboardMarkup with Domain Manager and Family Drive buttons
+    // Creates inline keyboard buttons for each URL with proper name and URL
     @Test
-    void test_execute_creates_inline_keyboard_markup_with_buttons() {
+    void test_creates_inline_keyboard_buttons() {
+        // Arrange
         UrlService urlService = mock(UrlService.class);
         TelegramBot bot = mock(TelegramBot.class);
-        CallbackQuery callback = mock(CallbackQuery.class);
+        CallbackQuery callbackQuery = mock(CallbackQuery.class);
         User user = mock(User.class);
-
-        when(callback.from()).thenReturn(user);
-        when(user.id()).thenReturn(123L);
-
-        Map<UrlService.UrlType, String> urlMap = Map.of(
-            UrlService.UrlType.DOMAIN_MANAGER, "http://domain-manager.com",
-            UrlService.UrlType.GOOGLE_DRIVE_FAMILY, "http://family-drive.com"
-        );
-        when(urlService.getAllUrls()).thenReturn(urlMap);
-
         UsefulUrlCallback usefulUrlCallback = new UsefulUrlCallback(urlService);
 
-        usefulUrlCallback.execute(bot, callback);
+        List<UsefulUrl> urls = List.of(
+            new UsefulUrl("Google", "https://google.com", "Search Engine"),
+            new UsefulUrl("GitHub", "https://github.com", "Code Hosting")
+        );
 
+        when(urlService.getUsefulUrls()).thenReturn(Optional.of(urls));
+        when(callbackQuery.from()).thenReturn(user);
+        when(user.id()).thenReturn(12345L);
+
+        // Act
+        usefulUrlCallback.execute(bot, callbackQuery);
+
+        // Assert
         ArgumentCaptor<SendMessage> messageCaptor = ArgumentCaptor.forClass(SendMessage.class);
         verify(bot).execute(messageCaptor.capture());
-        SendMessage capturedMessage = messageCaptor.getValue();
 
-        assertEquals(123L, capturedMessage.getParameters().get("chat_id"));
-        assertEquals("Useful URLs:", capturedMessage.getParameters().get("text"));
+        SendMessage sentMessage = messageCaptor.getValue();
+        assertEquals(12345L, sentMessage.getParameters().get("chat_id"));
+        assertEquals("Useful URLs:", sentMessage.getParameters().get("text"));
 
-        InlineKeyboardMarkup markup = (InlineKeyboardMarkup) capturedMessage.getParameters().get("reply_markup");
+        InlineKeyboardMarkup markup = (InlineKeyboardMarkup) sentMessage.getParameters().get("reply_markup");
         InlineKeyboardButton[][] keyboard = markup.inlineKeyboard();
 
-        assertEquals(1, keyboard.length);
-        assertEquals(2, keyboard[0].length);
-
-        assertEquals("Domain Manager", keyboard[0][0].text());
-        assertEquals("http://domain-manager.com", keyboard[0][0].url());
-        assertEquals("Family Drive", keyboard[0][1].text());
-        assertEquals("http://family-drive.com", keyboard[0][1].url());
+        assertEquals(2, keyboard.length);
+        assertEquals("Google", keyboard[0][0].text());
+        assertEquals("https://google.com", keyboard[0][0].url());
+        assertEquals("GitHub", keyboard[1][0].text());
+        assertEquals("https://github.com", keyboard[1][0].url());
     }
 }

@@ -1,38 +1,26 @@
 package com.dach.sagiri.service;
 
-import java.util.Map;
-import org.jetbrains.annotations.NotNull;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
-import com.dach.sagiri.property.UrlProperty;
+import com.dach.sagiri.property.FileProperty;
+import com.dach.sagiri.property.dto.Project;
+import com.dach.sagiri.property.dto.UsefulUrl;
 
 @Service
 public class UrlService {
 
-    private final UrlProperty urlProperty;
+    private final FileProperty fileProperty;
 
-    public UrlService(UrlProperty urlProperty) {
-        this.urlProperty = urlProperty;
+    public UrlService(FileProperty fileProperty) {
+        this.fileProperty = fileProperty;
     }
 
-    @NotNull
-    public String getDomainManagerUrl() {
-        return urlProperty.getDomainManager();
+    public Optional<List<UsefulUrl>> getUsefulUrls() {
+        return fileProperty.getUsefulUrls();
     }
 
-    @NotNull
-    public String getGoogleDriveFamilyUrl() {
-        return urlProperty.getGoogleDriveFamily();
-    }
-
-    public Map<UrlType, String> getAllUrls() {
-        return Map.of(
-            UrlType.DOMAIN_MANAGER, getDomainManagerUrl(),
-            UrlType.GOOGLE_DRIVE_FAMILY, getGoogleDriveFamilyUrl()
-        );
-    }
-
-    public enum UrlType {
-        DOMAIN_MANAGER,
-        GOOGLE_DRIVE_FAMILY
+    public Optional<List<Project>> getProjectList() {
+        return fileProperty.getProjectList();
     }
 }

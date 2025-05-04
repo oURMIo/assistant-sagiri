@@ -3,7 +3,7 @@ package com.dach.sagiri.bot.callback;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
-import com.dach.sagiri.property.dto.UsefulUrl;
+import com.dach.sagiri.property.dto.Project;
 import com.dach.sagiri.service.UrlService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.CallbackQuery;
@@ -12,29 +12,29 @@ import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
 
 @Component
-public class UsefulUrlCallback implements BotCallback {
+public class ProjectListCallback implements BotCallback {
 
     private final UrlService urlService;
 
-    public UsefulUrlCallback(UrlService urlService) {
+    public ProjectListCallback(UrlService urlService) {
         this.urlService = urlService;
     }
 
     @Override
     public String callback() {
-        return "useful_urls";
+        return "project_list";
     }
 
     @Override
     public void execute(TelegramBot bot, CallbackQuery callback) {
-        Optional<List<UsefulUrl>> usefulUrlsOptional = urlService.getUsefulUrls();
+        Optional<List<Project>> usefulUrlsOptional = urlService.getProjectList();
 
         if (usefulUrlsOptional.isEmpty()) {
-            bot.execute(new SendMessage(callback.from().id(), "Can't find useful urls இ௰இ"));
+            bot.execute(new SendMessage(callback.from().id(), "Can't find list of project இ௰இ"));
             return;
         }
 
-        List<UsefulUrl> usefulUrls = usefulUrlsOptional.get();
+        List<Project> usefulUrls = usefulUrlsOptional.get();
         SendMessage message = new SendMessage(callback.from().id(), "Useful URLs:");
 
         InlineKeyboardMarkup markup = createInlineKeyboardMarkup(usefulUrls);
@@ -43,7 +43,7 @@ public class UsefulUrlCallback implements BotCallback {
         bot.execute(message);
     }
 
-    private InlineKeyboardMarkup createInlineKeyboardMarkup(List<UsefulUrl> usefulUrls) {
+    private InlineKeyboardMarkup createInlineKeyboardMarkup(List<Project> usefulUrls) {
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
 
         usefulUrls.forEach(dto -> {

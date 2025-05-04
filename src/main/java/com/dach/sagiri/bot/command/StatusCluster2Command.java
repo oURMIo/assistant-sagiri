@@ -5,6 +5,7 @@ import com.dach.sagiri.property.ClusterProperty;
 import com.dach.sagiri.service.WebService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
+import com.pengrad.telegrambot.model.request.ReplyKeyboardRemove;
 import com.pengrad.telegrambot.request.SendMessage;
 
 @Component
@@ -26,10 +27,14 @@ public class StatusCluster2Command implements BotCommand {
     @Override
     public void execute(TelegramBot bot, Message message) {
         bot.execute(new SendMessage(message.chat().id(),
-            "I shall now scurry off to inspect the status of the 2 cluster..."));
+            "I shall now scurry off to inspect the status of the 2 cluster...")
+            .replyMarkup(new ReplyKeyboardRemove())
+        );
 
         String resultText = checkServers();
-        bot.execute(new SendMessage(message.chat().id(), resultText));
+        SendMessage sendMessage = new SendMessage(message.chat().id(), resultText)
+            .replyMarkup(new ReplyKeyboardRemove());
+        bot.execute(sendMessage);
     }
 
     private String checkServers() {

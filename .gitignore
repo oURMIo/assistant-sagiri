@@ -1,5 +1,7 @@
 ### Configs ###
 /src/main/resources/config.properties
+/src/main/resources/useful-url.json
+/src/main/resources/project-list.json
 
 ### Logs ###
 logs/
