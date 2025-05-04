@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 import com.dach.sagiri.property.dto.Project;
-import com.dach.sagiri.service.UrlService;
+import com.dach.sagiri.service.FileService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
@@ -14,10 +14,10 @@ import com.pengrad.telegrambot.request.SendMessage;
 @Component
 public class ProjectListCallback implements BotCallback {
 
-    private final UrlService urlService;
+    private final FileService fileService;
 
-    public ProjectListCallback(UrlService urlService) {
-        this.urlService = urlService;
+    public ProjectListCallback(FileService fileService) {
+        this.fileService = fileService;
     }
 
     @Override
@@ -27,7 +27,7 @@ public class ProjectListCallback implements BotCallback {
 
     @Override
     public void execute(TelegramBot bot, CallbackQuery callback) {
-        Optional<List<Project>> usefulUrlsOptional = urlService.getProjectList();
+        Optional<List<Project>> usefulUrlsOptional = fileService.getProjectList();
 
         if (usefulUrlsOptional.isEmpty()) {
             bot.execute(new SendMessage(callback.from().id(), "Can't find list of project இ௰இ"));

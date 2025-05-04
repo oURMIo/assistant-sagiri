@@ -8,11 +8,11 @@ import com.dach.sagiri.property.dto.Project;
 import com.dach.sagiri.property.dto.UsefulUrl;
 
 @Service
-public class UrlService {
+public class FileService {
 
     private final FileProperty fileProperty;
 
-    public UrlService(FileProperty fileProperty) {
+    public FileService(FileProperty fileProperty) {
         this.fileProperty = fileProperty;
     }
 

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 import com.dach.sagiri.property.dto.UsefulUrl;
-import com.dach.sagiri.service.UrlService;
+import com.dach.sagiri.service.FileService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
@@ -14,10 +14,10 @@ import com.pengrad.telegrambot.request.SendMessage;
 @Component
 public class UsefulUrlCallback implements BotCallback {
 
-    private final UrlService urlService;
+    private final FileService fileService;
 
-    public UsefulUrlCallback(UrlService urlService) {
-        this.urlService = urlService;
+    public UsefulUrlCallback(FileService fileService) {
+        this.fileService = fileService;
     }
 
     @Override
@@ -27,7 +27,7 @@ public class UsefulUrlCallback implements BotCallback {
 
     @Override
     public void execute(TelegramBot bot, CallbackQuery callback) {
-        Optional<List<UsefulUrl>> usefulUrlsOptional = urlService.getUsefulUrls();
+        Optional<List<UsefulUrl>> usefulUrlsOptional = fileService.getUsefulUrls();
 
         if (usefulUrlsOptional.isEmpty()) {
             bot.execute(new SendMessage(callback.from().id(), "Can't find useful urls இ௰இ"));
