@@ -27,11 +27,9 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./app/gradlew
-        working-directory: ./app
 
       - name: Verify gradle installation
         run: ./gradlew --version
-        working-directory: ./app
 
       - name: Build with Gradle
         run: ./gradlew clean build
