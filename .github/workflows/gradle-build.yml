@@ -22,15 +22,8 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: List files in app directory
-        run: ls -la ./app
-
       - name: Grant execute permission for gradlew
-        run: chmod +x ./app/gradlew
-
-      - name: Verify gradle installation
-        run: ./gradlew --version
+        run: chmod +x gradlew
 
       - name: Build with Gradle
         run: ./gradlew clean build
-        working-directory: ./app
