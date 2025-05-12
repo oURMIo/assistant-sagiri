@@ -3,7 +3,6 @@ package com.dach.sagiri.property;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import com.dach.sagiri.property.dto.UsefulUrl;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -20,7 +19,6 @@ class FilePropertyTest {
 
     // Successfully loads and parses useful URLs from the JSON file
     @Test
-    @Disabled("Can't find file")
     void test_get_useful_urls_success() {
         FileProperty fileProperty = new FileProperty();
 
