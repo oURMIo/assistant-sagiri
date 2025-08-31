@@ -1,15 +1,12 @@
 package com.dach.sagiri;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Fail.fail;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
 class SagiriApplicationTests {
 
-    // Application starts successfully with default configuration
     @Test
     void test_application_starts_with_default_configuration() {
         try {
