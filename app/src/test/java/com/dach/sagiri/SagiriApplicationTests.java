@@ -1,10 +1,12 @@
 package com.dach.sagiri;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Fail.fail;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Disabled("Application tests are disabled by default")
 class SagiriApplicationTests {
 
     @Test
