@@ -8,16 +8,11 @@ on:
     branches:
       - '**'
 
-env:
-  PROJECT_DIR: ./app
-
-defaults:
-  run:
-    working-directory: ${{ env.PROJECT_DIR }}
-
 jobs:
   codecov:
     runs-on: ubuntu-latest
+    env:
+      PROJECT_DIR: ./app
 
     steps:
       - name: Checkout code
@@ -31,9 +26,11 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+        working-directory: ${{ env.PROJECT_DIR }}
 
       - name: Run tests with coverage
         run: ./gradlew clean test jacocoTestReport
+        working-directory: ${{ env.PROJECT_DIR }}
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
