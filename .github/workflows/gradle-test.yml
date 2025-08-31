@@ -8,9 +8,18 @@ on:
     branches:
       - '**'
 
+env:
+  PROJECT_DIR: ./app
+
+defaults:
+  run:
+    working-directory: ${{ env.PROJECT_DIR }}
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      PROJECT_DIR: ./app
 
     steps:
       - name: Checkout code

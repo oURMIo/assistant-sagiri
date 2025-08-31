@@ -8,6 +8,13 @@ on:
     branches:
       - '**'
 
+env:
+  PROJECT_DIR: ./app
+
+defaults:
+  run:
+    working-directory: ${{ env.PROJECT_DIR }}
+
 jobs:
   codecov:
     runs-on: ubuntu-latest
