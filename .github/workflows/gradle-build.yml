@@ -8,13 +8,6 @@ on:
     branches:
       - '**'
 
-env:
-  PROJECT_DIR: ./app
-
-defaults:
-  run:
-    working-directory: ${{ env.PROJECT_DIR }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -33,6 +26,8 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+        working-directory: ${{ env.PROJECT_DIR }}
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test
+        working-directory: ${{ env.PROJECT_DIR }}
