@@ -19,7 +19,8 @@ public class StartCommand implements BotCommand {
 
     @Override
     public void execute(TelegramBot bot, Message message) {
+        long chatId = message.chat().id();
         String startMessage = "Greetings, " + message.from().firstName() + "\n" + START_MESSAGE_TEXT;
-        bot.execute(new SendMessage(message.chat().id(), startMessage));
+        bot.execute(new SendMessage(chatId, startMessage));
     }
 }

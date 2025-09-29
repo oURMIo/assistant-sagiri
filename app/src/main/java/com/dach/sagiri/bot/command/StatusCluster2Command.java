@@ -26,13 +26,14 @@ public class StatusCluster2Command implements BotCommand {
 
     @Override
     public void execute(TelegramBot bot, Message message) {
-        bot.execute(new SendMessage(message.chat().id(),
+        long chatId = message.chat().id();
+        bot.execute(new SendMessage(chatId,
             "I shall now scurry off to inspect the status of the 2 cluster...")
             .replyMarkup(new ReplyKeyboardRemove())
         );
 
         String resultText = checkServers();
-        SendMessage sendMessage = new SendMessage(message.chat().id(), resultText)
+        SendMessage sendMessage = new SendMessage(chatId, resultText)
             .replyMarkup(new ReplyKeyboardRemove());
         bot.execute(sendMessage);
     }

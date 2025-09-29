@@ -17,6 +17,7 @@ public class ClusterStatusCallback implements BotCallback {
 
     @Override
     public void execute(TelegramBot bot, CallbackQuery callback) {
+        long chatId = callback.from().id();
         KeyboardButton button1 = new KeyboardButton("/status_cluster1");
         KeyboardButton button2 = new KeyboardButton("/status_cluster2");
 
@@ -24,7 +25,7 @@ public class ClusterStatusCallback implements BotCallback {
             button1, button2);
         keyboard.resizeKeyboard(true);
 
-        SendMessage message = new SendMessage(callback.from().id(),
+        SendMessage message = new SendMessage(chatId,
             "Please select a cluster so that I may check its status for you")
             .replyMarkup(keyboard);
         bot.execute(message);

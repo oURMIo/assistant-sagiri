@@ -34,11 +34,12 @@ public class HelpCommand implements BotCommand {
 
     @Override
     public void execute(TelegramBot bot, Message message) {
+        long chatId = message.from().id();
         String messageText = "Hello "
                              + message.from().firstName()
                              + ", I provide a list of my capabilities";
 
-        SendMessage request = new SendMessage(message.chat().id(), messageText)
+        SendMessage request = new SendMessage(chatId, messageText)
             .replyMarkup(SUPPORTED_BUTTONS);
 
         bot.execute(request);

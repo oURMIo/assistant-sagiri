@@ -39,13 +39,16 @@ public class BotMessageService {
 
     private void processCallback(TelegramBot bot, Update update) {
         CallbackQuery callback = update.callbackQuery();
-        if (ObjectUtils.isNotEmpty(callback) && StringUtils.isNotBlank(callback.data())) {
-            try {
-                handleCallBack(bot, callback);
-            } catch (Exception e) {
-                logger.error("Got exception while execute callback for updateId:'{}', chatId:'{}'.",
-                    update.updateId(), callback.from().id(), e);
-            }
+        if (ObjectUtils.isEmpty(callback) || StringUtils.isBlank(callback.data())) {
+            return;
+        }
+
+        long chatId = callback.from().id();
+        try {
+            handleCallBack(bot, callback);
+        } catch (Exception e) {
+            logger.error("Got exception while execute callback for updateId:'{}', chatId:'{}'.",
+                update.updateId(), chatId, e);
         }
     }
 
@@ -69,7 +72,7 @@ public class BotMessageService {
         commandService.getCommand(text)
             .ifPresentOrElse(
                 cmd -> cmd.execute(bot, message),
-                () -> bot.execute(new SendMessage(message.chat().id(),
+                () -> bot.execute(new SendMessage(chatId,
                     "I do not understand you. Select a function from the given list /help"))
             );
     }
@@ -82,7 +85,7 @@ public class BotMessageService {
         callbackService.getCommand(data)
             .ifPresentOrElse(
                 cmd -> cmd.execute(bot, callback),
-                () -> bot.execute(new SendMessage(callback.from().id(),
+                () -> bot.execute(new SendMessage(chatId,
                     "I do not understand you. Select a function from the given list /help"))
             );
     }
