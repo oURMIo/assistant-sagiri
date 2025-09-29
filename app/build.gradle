@@ -27,7 +27,7 @@ dependencies {
   implementation("javax.inject:javax.inject:1")
   implementation("com.fasterxml.jackson.core:jackson-databind:2.20.0")
 
-  implementation('org.apache.commons:commons-lang3:3.18.0')
+  implementation('org.apache.commons:commons-lang3:3.19.0')
 
   implementation("org.springframework.boot:spring-boot-starter-logging")
 
