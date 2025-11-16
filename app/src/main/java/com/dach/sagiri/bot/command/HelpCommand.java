@@ -18,7 +18,7 @@ public class HelpCommand implements BotCommand {
             },
             {
                 new InlineKeyboardButton("🔔 Notification").callbackData("notification"),
-                new InlineKeyboardButton("🌐 Domain Status").callbackData("domain_status")
+                new InlineKeyboardButton("🎆 Holidays").callbackData("holiday")
             },
             {
                 new InlineKeyboardButton("🛠️ Project List").callbackData("project_list"),
