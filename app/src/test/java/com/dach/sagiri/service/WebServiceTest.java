@@ -163,9 +163,13 @@ class WebServiceTest {
             mockedBuilder.when(HttpClient::newBuilder).thenReturn(builder);
             when(builder.connectTimeout(any())).thenReturn(builder);
             when(builder.build()).thenReturn(httpClient);
-            when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
+            when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
+                .thenReturn(httpResponse);
 
-            List<HolidayNagerDto> list = webService.doRequestForList("https://example.org/ok", HolidayNagerDto.class);
+            webService = new WebService();
+
+            List<HolidayNagerDto> list =
+                webService.doRequestForList("https://example.org/ok", HolidayNagerDto.class);
             assertEquals(2, list.size());
             assertEquals("New Year", list.get(0).name());
             assertEquals("RU", list.get(0).countryCode());
@@ -182,9 +186,13 @@ class WebServiceTest {
             mockedBuilder.when(HttpClient::newBuilder).thenReturn(builder);
             when(builder.connectTimeout(any())).thenReturn(builder);
             when(builder.build()).thenReturn(httpClient);
-            when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
+            when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
+                .thenReturn(httpResponse);
 
-            List<HolidayNagerDto> list = webService.doRequestForList("https://example.org/bad", HolidayNagerDto.class);
+            webService = new WebService();
+
+            List<HolidayNagerDto> list =
+                webService.doRequestForList("https://example.org/bad", HolidayNagerDto.class);
             assertTrue(list.isEmpty());
         }
     }
@@ -218,6 +226,8 @@ class WebServiceTest {
 
             when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
                 .thenReturn(httpResponse);
+
+            webService = new WebService();
 
             Optional<String> result = webService.doRequest("https://example.org/api");
 
@@ -276,8 +286,6 @@ class WebServiceTest {
 
     @Test
     void doRequest_returns_empty_on_interrupted_exception_and_sets_interrupt_flag() throws Exception {
-        webService = new WebService();
-
         httpClient = mock(HttpClient.class);
 
         boolean wasInterruptedBefore = Thread.currentThread().isInterrupted();
@@ -290,7 +298,6 @@ class WebServiceTest {
 
             when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class)))
                 .thenAnswer(invocation -> {
-                    // Validate request details before throwing
                     HttpRequest req = invocation.getArgument(0);
                     assertEquals(URI.create("https://example.org/interrupt"), req.uri());
                     assertEquals("application/json", req.headers().firstValue("Accept").orElse(null));
@@ -298,6 +305,8 @@ class WebServiceTest {
                         req.headers().firstValue("Accept-Charset").orElse(null));
                     throw new InterruptedException("stop");
                 });
+
+            webService = new WebService();
 
             Optional<String> result = webService.doRequest("https://example.org/interrupt");
 
