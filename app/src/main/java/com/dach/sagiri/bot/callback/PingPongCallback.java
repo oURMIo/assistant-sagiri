@@ -16,7 +16,8 @@ public class PingPongCallback implements BotCallback {
 
     @Override
     public void execute(TelegramBot bot, CallbackQuery callback) {
+        long chatId = callback.from().id();
         bot.execute(new AnswerCallbackQuery(callback.id()).text("Pong 🏓"));
-        bot.execute(new SendMessage(callback.from().id(), "Pong 🏓"));
+        bot.execute(new SendMessage(chatId, "Pong 🏓"));
     }
 }

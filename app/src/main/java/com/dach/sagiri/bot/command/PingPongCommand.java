@@ -15,6 +15,7 @@ public class PingPongCommand implements BotCommand {
 
     @Override
     public void execute(TelegramBot bot, Message message) {
-        bot.execute(new SendMessage(message.chat().id(), "Pong 🏓"));
+        long chatId = message.chat().id();
+        bot.execute(new SendMessage(chatId, "Pong 🏓"));
     }
 }

@@ -27,15 +27,16 @@ public class ProjectListCallback implements BotCallback {
 
     @Override
     public void execute(TelegramBot bot, CallbackQuery callback) {
+        long chatId = callback.from().id();
         Optional<List<Project>> usefulUrlsOptional = fileService.getProjectList();
 
         if (usefulUrlsOptional.isEmpty()) {
-            bot.execute(new SendMessage(callback.from().id(), "Can't find list of project இ௰இ"));
+            bot.execute(new SendMessage(chatId, "Can't find list of project இ௰இ"));
             return;
         }
 
         List<Project> usefulUrls = usefulUrlsOptional.get();
-        SendMessage message = new SendMessage(callback.from().id(), "Useful URLs:");
+        SendMessage message = new SendMessage(chatId, "Useful URLs:");
 
         InlineKeyboardMarkup markup = createInlineKeyboardMarkup(usefulUrls);
 

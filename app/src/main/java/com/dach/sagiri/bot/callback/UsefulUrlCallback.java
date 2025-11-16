@@ -27,15 +27,16 @@ public class UsefulUrlCallback implements BotCallback {
 
     @Override
     public void execute(TelegramBot bot, CallbackQuery callback) {
+        long chatId = callback.from().id();
         Optional<List<UsefulUrl>> usefulUrlsOptional = fileService.getUsefulUrls();
 
         if (usefulUrlsOptional.isEmpty()) {
-            bot.execute(new SendMessage(callback.from().id(), "Can't find useful urls இ௰இ"));
+            bot.execute(new SendMessage(chatId, "Can't find useful urls இ௰இ"));
             return;
         }
 
         List<UsefulUrl> usefulUrls = usefulUrlsOptional.get();
-        SendMessage message = new SendMessage(callback.from().id(), "Useful URLs:");
+        SendMessage message = new SendMessage(chatId, "Useful URLs:");
 
         InlineKeyboardMarkup markup = createInlineKeyboardMarkup(usefulUrls);
 
