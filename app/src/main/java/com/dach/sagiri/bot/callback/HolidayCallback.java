@@ -1,5 +1,6 @@
 package com.dach.sagiri.bot.callback;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 import com.dach.sagiri.domain.dto.nager.HolidayNagerDto;
@@ -19,6 +20,9 @@ public class HolidayCallback implements BotCallback {
             {
                 new InlineKeyboardButton("\uD83C\uDDF7\uD83C\uDDFA RUS").callbackData("holiday rus"),
                 new InlineKeyboardButton("\uD83C\uDDE6\uD83C\uDDF2 ARM").callbackData("holiday arm")
+            },
+            {
+                new InlineKeyboardButton("🗺️ Global List").callbackData("holiday all")
             }
         }
     );
@@ -39,29 +43,51 @@ public class HolidayCallback implements BotCallback {
         long chatId = callback.from().id();
         String data = callback.data();
 
-        SendMessage sendMessage = switch (data) {
-            case "holiday rus" -> sendRusTodayHoliday(chatId);
-            case "holiday arm" -> sendArmTodayHoliday(chatId);
-            default -> defaultMessage(chatId);
-        };
-
-        bot.execute(sendMessage);
+        switch (data) {
+            case "holiday rus" -> processRusTodayHoliday(bot, chatId);
+            case "holiday arm" -> processArmTodayHoliday(bot, chatId);
+            case "holiday all" -> processAllHolidays(bot, chatId);
+            default -> processDefaultMessage(bot, chatId);
+        }
     }
 
-    private SendMessage defaultMessage(long chatId) {
+    private void processDefaultMessage(TelegramBot bot, long chatId) {
         String messageText = "Please select the country you are interested in:";
-        return new SendMessage(chatId, messageText)
+        SendMessage message = new SendMessage(chatId, messageText)
             .replyMarkup(KEYBOARD);
+        bot.execute(message);
     }
 
-    private SendMessage sendRusTodayHoliday(long chatId) {
+    private void processRusTodayHoliday(TelegramBot bot, long chatId) {
         String messageText = getTodayHoliday(NagerCountry.RU);
-        return new SendMessage(chatId, messageText);
+        SendMessage message = new SendMessage(chatId, messageText);
+        bot.execute(message);
     }
 
-    private SendMessage sendArmTodayHoliday(long chatId) {
+    private void processArmTodayHoliday(TelegramBot bot, long chatId) {
         String messageText = getTodayHoliday(NagerCountry.AM);
-        return new SendMessage(chatId, messageText);
+        SendMessage message = new SendMessage(chatId, messageText);
+        bot.execute(message);
+    }
+
+    private void processAllHolidays(TelegramBot bot, long chatId) {
+        bot.execute(
+            new SendMessage(chatId, "I’ll go ahead and gather the data. It may take a bit of time, so please hold on for a moment."));
+
+        List<String> holidays = holidayService.getTodayHolidaysFromKakoySegodnyaPrazdnik();
+        StringBuilder messageText = new StringBuilder("Here is a list of today's holidays in many countries:")
+            .append("\n")
+            .append("\n");
+        int index = 1;
+        for (String holiday : holidays) {
+            messageText
+                .append(index++)
+                .append(". ")
+                .append(holiday)
+                .append("\n");
+        }
+        SendMessage message = new SendMessage(chatId, messageText.toString());
+        bot.execute(message);
     }
 
     private String getTodayHoliday(NagerCountry country) {

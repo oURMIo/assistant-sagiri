@@ -29,8 +29,15 @@ public class WebService {
     private static final int SSH_PORT = 22;
     private static final int BODY_PREVIEW_LIMIT = 1000;
 
+    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(5);
+    private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(10);
+
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final JavaTimeModule javaTimeModule = new JavaTimeModule();
+
+    private final HttpClient httpClient = HttpClient.newBuilder()
+        .connectTimeout(CONNECT_TIMEOUT)
+        .build();
 
     public boolean checkClusterStatus(String clusterDomain) {
         if (clusterDomain == null || clusterDomain.isBlank()) {
@@ -71,44 +78,79 @@ public class WebService {
     }
 
     public Optional<String> doRequest(String url) {
-        if (url == null || url.isBlank()) {
+        Optional<URI> uriOpt = toUri(url);
+        if (uriOpt.isEmpty()) {
             return Optional.empty();
         }
-
-        URI uri;
-        try {
-            uri = URI.create(url);
-        } catch (IllegalArgumentException ex) {
-            logger.error("Invalid URL provided: {}", url, ex);
-            return Optional.empty();
-        }
-
-        HttpClient client = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(5))
-            .build();
 
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(uri)
-            .timeout(Duration.ofSeconds(10))
+            .uri(uriOpt.get())
+            .timeout(REQUEST_TIMEOUT)
             .header("Accept", "application/json")
             .header("Accept-Charset", StandardCharsets.UTF_8.name())
             .GET()
             .build();
 
+        return sendRequest(request);
+    }
+
+    public Optional<String> doSafeRequest(String url) {
+        Optional<URI> uriOpt = toUri(url);
+        if (uriOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        URI uri = uriOpt.get();
+
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+            .uri(uri)
+            .timeout(REQUEST_TIMEOUT)
+            .header("User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+                "AppleWebKit/537.36 (KHTML, like Gecko) " +
+                "Chrome/120.0.0.0 Safari/537.36")
+            .header("Accept",
+                "text/html,application/xhtml+xml,application/xml;q=0.9," +
+                "image/avif,image/webp,image/apng,*/*;q=0.8")
+            .header("Accept-Language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7")
+            .header("Accept-Charset", StandardCharsets.UTF_8.name())
+            .GET();
+
+        if ("https".equalsIgnoreCase(uri.getScheme())) {
+            builder.header("Referer", url);
+        }
+
+        return sendRequest(builder.build());
+    }
+
+    private Optional<URI> toUri(String url) {
+        if (url == null || url.isBlank()) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(URI.create(url));
+        } catch (IllegalArgumentException ex) {
+            logger.error("Invalid URL provided: {}", url, ex);
+            return Optional.empty();
+        }
+    }
+
+    private Optional<String> sendRequest(HttpRequest request) {
+        URI uri = request.uri();
         logger.info("Sending HTTP GET request to {}", uri);
 
         try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             int status = response.statusCode();
+
             if (status >= 200 && status < 300) {
-                String body = response.body();
-                return Optional.ofNullable(body);
-            } else {
-                String bodyPreview = truncate(response.body());
-                logger.warn("Non-2xx response from {}: status={}, bodyPreview={}", uri, status, bodyPreview);
-                return Optional.empty();
+                return Optional.ofNullable(response.body());
             }
+
+            String bodyPreview = truncate(response.body());
+            logger.warn("Non-2xx response from {}: status={}, bodyPreview={}", uri, status, bodyPreview);
+            return Optional.empty();
+
         } catch (IOException e) {
             logger.error("I/O error during HTTP request to {}", uri, e);
             return Optional.empty();
@@ -129,7 +171,7 @@ public class WebService {
         return body.substring(0, WebService.BODY_PREVIEW_LIMIT) + "...(truncated)";
     }
 
-    private boolean testConnection(String host) {
+    private static boolean testConnection(String host) {
         try (Socket socket = new Socket()) {
             socket.connect(new InetSocketAddress(host, SSH_PORT), CHECK_STATUS_TIMEOUT_MS);
             return true;
