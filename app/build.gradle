@@ -25,9 +25,9 @@ repositories {
 dependencies {
   implementation("com.github.pengrad:java-telegram-bot-api:9.3.0")
   implementation("javax.inject:javax.inject:1")
-  implementation("com.fasterxml.jackson.core:jackson-databind:2.20.1")
+  implementation("com.fasterxml.jackson.core:jackson-databind:2.21.3")
   implementation("com.google.code.gson:gson:2.13.2")
-  implementation 'com.fasterxml.jackson.core:jackson-databind:2.20.1'
+  implementation 'com.fasterxml.jackson.core:jackson-databind:2.21.3'
   implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.1'
   implementation("org.jsoup:jsoup:1.22.1")
 
