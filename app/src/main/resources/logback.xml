@@ -1,14 +1,14 @@
 <configuration>
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%magenta(%d{HH:mm:ss.SSS}) %highlight(%-5level) [%blue(%t)] %yellow(%logger{20}): %msg%n%throwable</pattern>
+      <pattern>%highlight(%-5level) %d{HH:mm:ss.SSS} [%blue(%t)] %yellow(%logger{30}): %msg%n%throwable</pattern>
     </encoder>
   </appender>
 
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
     <file>./logs/application.log</file>
     <encoder>
-      <pattern>%magenta(%d{HH:mm:ss.SSS}) %highlight(%-5level) [%blue(%t)] %yellow(%logger{20}): %msg%n%throwable</pattern>
+      <pattern>%highlight(%-5level) %d{HH:mm:ss.SSS} [%blue(%t)] %yellow(%logger{30}): %msg%n%throwable</pattern>
     </encoder>
   </appender>
 
@@ -19,7 +19,7 @@
       <level>ERROR</level>
     </filter>
     <encoder>
-      <pattern>%magenta(%d{HH:mm:ss.SSS}) %highlight(%-5level) [%blue(%t)] %yellow(%logger{20}): %msg%n%throwable</pattern>
+      <pattern>%highlight(%-5level) %d{HH:mm:ss.SSS} [%blue(%t)] %yellow(%logger{30}): %msg%n%throwable</pattern>
     </encoder>
   </appender>
 

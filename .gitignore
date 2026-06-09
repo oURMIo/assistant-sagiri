@@ -3,6 +3,9 @@
 /app/src/main/resources/useful-url.json
 /app/src/main/resources/project-list.json
 
+### AI ###
+/.claude/settings.local.json
+
 ### Logs ###
 logs/
 
