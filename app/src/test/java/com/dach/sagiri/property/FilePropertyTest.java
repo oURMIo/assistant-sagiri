@@ -1,12 +1,18 @@
 package com.dach.sagiri.property;
 
+import java.io.File;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import com.dach.sagiri.property.dto.UsefulUrl;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,6 +22,19 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 class FilePropertyTest {
+
+    private static final File USERS_FILE = new File("users-list.json");
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    @BeforeEach
+    void removeUsersFileBefore() {
+        USERS_FILE.delete();
+    }
+
+    @AfterEach
+    void removeUsersFileAfter() {
+        USERS_FILE.delete();
+    }
 
     // Successfully loads and parses useful URLs from the JSON file
     @Test
@@ -51,5 +70,54 @@ class FilePropertyTest {
         );
 
         assertFalse(result.isPresent());
+    }
+
+    // addUser creates the users file when it does not exist yet
+    @Test
+    void test_add_user_creates_file_with_single_user() throws Exception {
+        FileProperty fileProperty = new FileProperty();
+
+        fileProperty.addUser("stranger");
+
+        assertTrue(USERS_FILE.exists());
+        assertEquals(List.of("stranger"), readUsers());
+    }
+
+    // addUser appends a new user to the already existing list
+    @Test
+    void test_add_user_appends_to_existing_list() throws Exception {
+        FileProperty fileProperty = new FileProperty();
+
+        fileProperty.addUser("first");
+        fileProperty.addUser("second");
+
+        assertEquals(List.of("first", "second"), readUsers());
+    }
+
+    // addUser does not store the same user twice
+    @Test
+    void test_add_user_ignores_duplicates() throws Exception {
+        FileProperty fileProperty = new FileProperty();
+
+        fileProperty.addUser("stranger");
+        fileProperty.addUser("stranger");
+
+        assertEquals(List.of("stranger"), readUsers());
+    }
+
+    // addUser swallows parse errors instead of propagating them
+    @Test
+    void test_add_user_swallows_broken_file() throws Exception {
+        Files.writeString(USERS_FILE.toPath(), "not a json array");
+        FileProperty fileProperty = new FileProperty();
+
+        fileProperty.addUser("stranger");
+
+        assertEquals("not a json array", Files.readString(USERS_FILE.toPath()));
+    }
+
+    private List<String> readUsers() throws Exception {
+        return MAPPER.readValue(USERS_FILE, new TypeReference<List<String>>() {
+        });
     }
 }
