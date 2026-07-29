@@ -59,6 +59,7 @@ public class BotMessageService {
             fileService.updateBlackList(username);
             return;
         }
+        fileService.saveAdminChatId(chatId);
 
         try {
             handleCallBack(bot, callback);
@@ -77,6 +78,7 @@ public class BotMessageService {
                 fileService.updateBlackList(username);
                 return;
             }
+            fileService.saveAdminChatId(message.chat().id());
 
             try {
                 handleMessage(bot, message);

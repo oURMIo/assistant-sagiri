@@ -18,6 +18,7 @@ import com.pengrad.telegrambot.request.SendMessage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -70,6 +71,39 @@ class BotMessageServiceTest {
 
         verify(command).execute(telegramBot, update.message());
         verify(fileService, never()).updateBlackList(anyString());
+    }
+
+    // Admin chatId is remembered so the cluster monitor can reach the admin later
+    @Test
+    void test_admin_chat_id_is_stored_on_message() {
+        TelegramBot telegramBot = mock(TelegramBot.class);
+        Update update = messageUpdate(ADMIN, "/help");
+
+        process(telegramBot, update);
+
+        verify(fileService).saveAdminChatId(100L);
+    }
+
+    // Admin chatId is remembered on callbacks as well
+    @Test
+    void test_admin_chat_id_is_stored_on_callback() {
+        TelegramBot telegramBot = mock(TelegramBot.class);
+        Update update = callbackUpdate(ADMIN, "ping");
+
+        process(telegramBot, update);
+
+        verify(fileService).saveAdminChatId(100L);
+    }
+
+    // A stranger's chatId is never stored as the admin one
+    @Test
+    void test_non_admin_chat_id_is_not_stored() {
+        TelegramBot telegramBot = mock(TelegramBot.class);
+        Update update = messageUpdate("stranger", "/help");
+
+        process(telegramBot, update);
+
+        verify(fileService, never()).saveAdminChatId(anyLong());
     }
 
     // Message from a non-admin is ignored and the sender is blacklisted

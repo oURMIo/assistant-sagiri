@@ -2,6 +2,8 @@ package com.dach.sagiri.property;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +24,7 @@ public class FileProperty {
     private static final String USEFUL_URL_FILE_PATH = "useful-url.json";
     private static final String PROJECT_LIST_FILE_PATH = "project-list.json";
     private static final String USERS_FILE_PATH = "users-list.json";
+    private static final String ADMIN_CHAT_ID_FILE_PATH = "admin-chat-id.txt";
 
     public Optional<List<UsefulUrl>> getUsefulUrls() {
         return loadFromJson(USEFUL_URL_FILE_PATH, new TypeReference<>() {
@@ -50,6 +53,32 @@ public class FileProperty {
             mapper.writeValue(file, users);
         } catch (Exception e) {
             logger.error("Failed to add user '{}' to '{}': {}", username, USERS_FILE_PATH, e.getMessage(), e);
+        }
+    }
+
+    public void saveAdminChatId(long chatId) {
+        if (getAdminChatId().filter(saved -> saved == chatId).isPresent()) {
+            return;
+        }
+        try {
+            Files.writeString(Path.of(ADMIN_CHAT_ID_FILE_PATH), String.valueOf(chatId));
+        } catch (Exception e) {
+            logger.error("Failed to save admin chatId '{}' to '{}': {}",
+                chatId, ADMIN_CHAT_ID_FILE_PATH, e.getMessage(), e);
+        }
+    }
+
+    public Optional<Long> getAdminChatId() {
+        Path path = Path.of(ADMIN_CHAT_ID_FILE_PATH);
+        if (!Files.exists(path)) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(Long.parseLong(Files.readString(path).trim()));
+        } catch (Exception e) {
+            logger.error("Failed to read admin chatId from '{}': {}",
+                ADMIN_CHAT_ID_FILE_PATH, e.getMessage(), e);
+            return Optional.empty();
         }
     }
 

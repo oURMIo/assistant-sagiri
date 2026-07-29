@@ -27,4 +27,12 @@ public class FileService {
     public void updateBlackList(String username) {
         fileProperty.addUser(username);
     }
+
+    public void saveAdminChatId(long chatId) {
+        fileProperty.saveAdminChatId(chatId);
+    }
+
+    public Optional<Long> getAdminChatId() {
+        return fileProperty.getAdminChatId();
+    }
 }

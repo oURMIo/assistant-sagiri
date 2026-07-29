@@ -24,16 +24,19 @@ import static org.mockito.Mockito.when;
 class FilePropertyTest {
 
     private static final File USERS_FILE = new File("users-list.json");
+    private static final File ADMIN_CHAT_ID_FILE = new File("admin-chat-id.txt");
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @BeforeEach
     void removeUsersFileBefore() {
         USERS_FILE.delete();
+        ADMIN_CHAT_ID_FILE.delete();
     }
 
     @AfterEach
     void removeUsersFileAfter() {
         USERS_FILE.delete();
+        ADMIN_CHAT_ID_FILE.delete();
     }
 
     // Successfully loads and parses useful URLs from the JSON file
@@ -114,6 +117,45 @@ class FilePropertyTest {
         fileProperty.addUser("stranger");
 
         assertEquals("not a json array", Files.readString(USERS_FILE.toPath()));
+    }
+
+    // Admin chatId is unknown while the file does not exist
+    @Test
+    void test_get_admin_chat_id_returns_empty_when_file_is_absent() {
+        FileProperty fileProperty = new FileProperty();
+
+        assertTrue(fileProperty.getAdminChatId().isEmpty());
+    }
+
+    // Saved admin chatId is read back from the file
+    @Test
+    void test_save_and_get_admin_chat_id() {
+        FileProperty fileProperty = new FileProperty();
+
+        fileProperty.saveAdminChatId(12345L);
+
+        assertTrue(ADMIN_CHAT_ID_FILE.exists());
+        assertEquals(Optional.of(12345L), fileProperty.getAdminChatId());
+    }
+
+    // Newer chatId replaces the previously stored one
+    @Test
+    void test_save_admin_chat_id_overwrites_previous_value() {
+        FileProperty fileProperty = new FileProperty();
+
+        fileProperty.saveAdminChatId(1L);
+        fileProperty.saveAdminChatId(2L);
+
+        assertEquals(Optional.of(2L), fileProperty.getAdminChatId());
+    }
+
+    // Broken file content is swallowed and reported as unknown chatId
+    @Test
+    void test_get_admin_chat_id_swallows_broken_file() throws Exception {
+        Files.writeString(ADMIN_CHAT_ID_FILE.toPath(), "not a number");
+        FileProperty fileProperty = new FileProperty();
+
+        assertTrue(fileProperty.getAdminChatId().isEmpty());
     }
 
     private List<String> readUsers() throws Exception {

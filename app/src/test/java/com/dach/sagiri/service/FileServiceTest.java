@@ -58,4 +58,26 @@ class FileServiceTest {
 
         Mockito.verify(mockFileProperty).addUser("stranger");
     }
+
+    // saveAdminChatId delegates the chatId to FileProperty
+    @Test
+    void test_save_admin_chat_id_delegates_to_file_property() {
+        FileProperty mockFileProperty = Mockito.mock(FileProperty.class);
+        FileService fileService = new FileService(mockFileProperty);
+
+        fileService.saveAdminChatId(100L);
+
+        Mockito.verify(mockFileProperty).saveAdminChatId(100L);
+    }
+
+    // getAdminChatId returns the value stored by FileProperty
+    @Test
+    void test_get_admin_chat_id_returns_stored_value() {
+        FileProperty mockFileProperty = Mockito.mock(FileProperty.class);
+        Mockito.when(mockFileProperty.getAdminChatId()).thenReturn(Optional.of(100L));
+
+        FileService fileService = new FileService(mockFileProperty);
+
+        assertEquals(Optional.of(100L), fileService.getAdminChatId());
+    }
 }
