@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-  implementation("com.github.pengrad:java-telegram-bot-api:9.3.0")
+  implementation("com.github.pengrad:java-telegram-bot-api:10.1.0")
   implementation("javax.inject:javax.inject:1")
   implementation("com.fasterxml.jackson.core:jackson-databind:2.21.3")
   implementation("com.google.code.gson:gson:2.14.0")
