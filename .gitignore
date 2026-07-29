@@ -5,6 +5,8 @@
 /app/src/main/resources/users-list.json
 /app/users-list.json
 /users-list.json
+/app/admin-chat-id.txt
+/admin-chat-id.txt
 
 ### AI ###
 /.claude/settings.local.json
