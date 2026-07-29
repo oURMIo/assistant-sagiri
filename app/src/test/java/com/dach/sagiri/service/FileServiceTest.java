@@ -47,4 +47,15 @@ class FileServiceTest {
         assertFalse(result.isPresent());
         assertTrue(result.isEmpty());
     }
+
+    // updateBlackList delegates the username to FileProperty.addUser
+    @Test
+    void test_update_black_list_delegates_to_file_property() {
+        FileProperty mockFileProperty = Mockito.mock(FileProperty.class);
+        FileService fileService = new FileService(mockFileProperty);
+
+        fileService.updateBlackList("stranger");
+
+        Mockito.verify(mockFileProperty).addUser("stranger");
+    }
 }

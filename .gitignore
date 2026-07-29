@@ -2,6 +2,9 @@
 /app/src/main/resources/config.properties
 /app/src/main/resources/useful-url.json
 /app/src/main/resources/project-list.json
+/app/src/main/resources/users-list.json
+/app/users-list.json
+/users-list.json
 
 ### AI ###
 /.claude/settings.local.json

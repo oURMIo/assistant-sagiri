@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.dach.sagiri.property.BotConfigProperty;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.CallbackQuery;
@@ -20,14 +21,22 @@ public class BotMessageService {
 
     private final CommandService commandService;
     private final CallbackService callbackService;
+    private final String adminName;
+    private final FileService fileService;
 
     @Autowired
-    public BotMessageService(CommandService commandService, CallbackService callbackService) {
+    public BotMessageService(BotConfigProperty botConfigProperty,
+        CommandService commandService,
+        CallbackService callbackService,
+        FileService fileService) {
+        this.adminName = botConfigProperty.getBotAdmin();
         this.commandService = commandService;
         this.callbackService = callbackService;
+        this.fileService = fileService;
     }
 
     public void registerListener(TelegramBot bot) {
+
         bot.setUpdatesListener(updates -> {
             for (Update update : updates) {
                 processCallback(bot, update);
@@ -44,6 +53,13 @@ public class BotMessageService {
         }
 
         long chatId = callback.from().id();
+        String username = callback.from().username();
+
+        if (!checkAdminMessage(username)) {
+            fileService.updateBlackList(username);
+            return;
+        }
+
         try {
             handleCallBack(bot, callback);
         } catch (Exception e) {
@@ -55,6 +71,13 @@ public class BotMessageService {
     private void processMessage(TelegramBot bot, Update update) {
         Message message = update.message();
         if (ObjectUtils.isNotEmpty(message) && StringUtils.isNotBlank(message.text())) {
+            String username = message.from().username();
+
+            if (!checkAdminMessage(username)) {
+                fileService.updateBlackList(username);
+                return;
+            }
+
             try {
                 handleMessage(bot, message);
             } catch (Exception e) {
@@ -88,5 +111,9 @@ public class BotMessageService {
                 () -> bot.execute(new SendMessage(chatId,
                     "I do not understand you. Select a function from the given list /help"))
             );
+    }
+
+    private boolean checkAdminMessage(String username) {
+        return !username.isBlank() && adminName.equals(username);
     }
 }

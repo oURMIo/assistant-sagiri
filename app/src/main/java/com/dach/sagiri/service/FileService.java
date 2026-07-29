@@ -23,4 +23,8 @@ public class FileService {
     public Optional<List<Project>> getProjectList() {
         return fileProperty.getProjectList();
     }
+
+    public void updateBlackList(String username) {
+        fileProperty.addUser(username);
+    }
 }

@@ -1,6 +1,8 @@
 package com.dach.sagiri.property;
 
+import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -19,6 +21,7 @@ public class FileProperty {
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final String USEFUL_URL_FILE_PATH = "useful-url.json";
     private static final String PROJECT_LIST_FILE_PATH = "project-list.json";
+    private static final String USERS_FILE_PATH = "users-list.json";
 
     public Optional<List<UsefulUrl>> getUsefulUrls() {
         return loadFromJson(USEFUL_URL_FILE_PATH, new TypeReference<>() {
@@ -28,6 +31,26 @@ public class FileProperty {
     public Optional<List<Project>> getProjectList() {
         return loadFromJson(PROJECT_LIST_FILE_PATH, new TypeReference<>() {
         });
+    }
+
+    public void addUser(String username) {
+        File file = new File(USERS_FILE_PATH);
+        try {
+            List<String> users;
+            if (file.exists()) {
+                users = mapper.readValue(file, new TypeReference<>() {
+                });
+            } else {
+                users = new ArrayList<>();
+            }
+            if (users.contains(username)) {
+                return;
+            }
+            users.add(username);
+            mapper.writeValue(file, users);
+        } catch (Exception e) {
+            logger.error("Failed to add user '{}' to '{}': {}", username, USERS_FILE_PATH, e.getMessage(), e);
+        }
     }
 
     private <T> Optional<List<T>> loadFromJson(String path, TypeReference<List<T>> typeRef) {
