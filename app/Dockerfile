@@ -1,7 +1,7 @@
-FROM gradle:8.13-jdk21 AS builder
+FROM mcr.microsoft.com/openjdk/jdk:21-ubuntu AS builder
 WORKDIR /app
 COPY . .
-RUN gradle bootJar
+RUN sh ./gradlew --no-daemon bootJar
 
 FROM mcr.microsoft.com/openjdk/jdk:21-ubuntu AS runtime
 WORKDIR /app
